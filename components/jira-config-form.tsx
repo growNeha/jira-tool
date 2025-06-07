@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -31,6 +31,16 @@ export function JiraConfigForm({ onConfigSave, onIssuesFetched, loading, setLoad
   const [error, setError] = useState<string>("")
   const [success, setSuccess] = useState<string>("")
 
+  // Load config from localStorage on mount
+  useEffect(() => {
+    const savedConfig = localStorage.getItem("jiraConfig")
+    if (savedConfig) {
+      try {
+        setConfig(JSON.parse(savedConfig))
+      } catch {}
+    }
+  }, [])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -42,6 +52,8 @@ export function JiraConfigForm({ onConfigSave, onIssuesFetched, loading, setLoad
       onConfigSave(config)
       onIssuesFetched(issues)
       setSuccess(`Successfully fetched ${issues.length} issues from sprint "${config.sprintName}"`)
+      // Save config to localStorage
+      localStorage.setItem("jiraConfig", JSON.stringify(config))
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch sprint data")
     } finally {
