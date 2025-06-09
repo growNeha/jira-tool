@@ -132,25 +132,43 @@ export function SprintData({ issues, loading }: SprintDataProps) {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(developerStats).map(([developer, stats]) => (
-              <div key={developer} className="flex items-center space-x-3 p-3 border rounded-lg">
-                <Avatar>
-                  <AvatarFallback>
-                    {developer
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")
-                      .toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <p className="font-medium">{developer}</p>
-                  <p className="text-sm text-gray-500">
-                    {stats.storyPoints} SP • {stats.issues} issues
-                  </p>
+            {Object.entries(developerStats).map(([developer, stats]) => {
+              // Get issues assigned to this developer
+              const devIssues = issues.filter((issue) => issue.assignee === developer)
+              return (
+                <div key={developer} className="flex flex-col space-y-2 p-3 border rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Avatar>
+                      <AvatarFallback>
+                        {developer
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <p className="font-medium">{developer}</p>
+                      <p className="text-sm text-gray-500">
+                        {stats.storyPoints} SP • {stats.issues} issues
+                      </p>
+                    </div>
+                  </div>
+                  {/* Assigned tickets */}
+                  <div className="pl-10 pt-1">
+                    <p className="text-xs font-semibold text-gray-400 mb-1">Assigned Tickets:</p>
+                    <ul className="space-y-1">
+                      {devIssues.map((issue) => (
+                        <li key={issue.key} className="flex flex-col md:flex-row md:items-center md:space-x-2 text-xs text-gray-700 bg-gray-50 rounded px-2 py-1">
+                          <span className="font-semibold text-blue-700">{issue.key}</span>
+                          <span className="truncate max-w-xs md:max-w-[180px] lg:max-w-[220px]">{issue.summary}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </CardContent>
       </Card>
